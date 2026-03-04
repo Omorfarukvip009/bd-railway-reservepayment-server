@@ -3,19 +3,20 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="styles.css">
-<title>User Login</title>
+<title>Railway Login</title>
 </head>
 <body>
 
 <div class="container">
   <div class="card">
+    <img src="logo.png" class="logo">
     <h2>User Login</h2>
 
-    <input id="username" placeholder="Username" class="input"><br>
-    <input id="password" type="password" placeholder="Password" class="input"><br>
+    <input id="username" class="input" placeholder="Username">
+    <input id="password" type="password" class="input" placeholder="Password">
     <button onclick="login()" class="btn">Login</button>
 
-    <div id="result"></div>
+    <div id="result" style="margin-top:15px;text-align:center;"></div>
   </div>
 </div>
 
@@ -31,7 +32,7 @@ async function login(){
   });
 
   if(res.status===404){
-    document.body.innerHTML="<h1 style='text-align:center;margin-top:100px'>404 Not Found</h1>";
+    document.body.innerHTML="<h1 style='color:white;text-align:center;margin-top:100px'>404 Not Found</h1>";
     return;
   }
 
@@ -41,11 +42,9 @@ async function login(){
     return;
   }
 
-  result.innerHTML=`
-    <h3>Payment Info</h3>
-    bKash: ${data.bkashNumber}<br>
-    Amount: ৳${data.amount}
-  `;
+  result.innerHTML=
+    `<b>Payment Number:</b> ${data.bkashNumber}<br>
+     <b>Amount:</b> ৳${data.amount}`;
 }
 </script>
 
