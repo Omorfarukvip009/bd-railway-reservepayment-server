@@ -1,114 +1,61 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const path = require("path");
-const crypto = require("crypto");
-const { MongoClient } = require("mongodb");
 
+dotenv.config();
 const app = express();
 app.use(express.json());
-app.set("trust proxy", 1);
+app.use(express.urlencoded({ extended: true }));
 
-const PORT = process.env.PORT || 3000;
-
-// ===== MongoDB =====
-const client = new MongoClient(process.env.MONGODB_URI);
-let db;
-
-async function start() {
-  await client.connect();
-  db = client.db("railway");
-  console.log("MongoDB Connected");
-}
-start();
-
-// ===== Simple Token System =====
-function sign(data) {
-  return crypto.createHmac("sha256", process.env.JWT_SECRET)
-    .update(JSON.stringify(data))
-    .digest("hex");
-}
-
-function verify(token, data) {
-  return token === sign(data);
-}
-
-function parseCookies(req) {
-  const raw = req.headers.cookie || "";
-  const out = {};
-  raw.split(";").forEach(p => {
-    const [k, v] = p.trim().split("=");
-    out[k] = v;
-  });
-  return out;
-}
-
-// ================= USER LOGIN =================
-app.post("/api/user/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  const user = await db.collection("users").findOne({ username, password });
-
-  if (!user) return res.status(401).json({ ok: false });
-
-  if (user.blocked)
-    return res.status(404).send("404 Not Found");
-
-  res.json({
-    ok: true,
-    bkashNumber: user.bkashNumber,
-    amount: user.amount
-  });
-});
-
-// ================= ADMIN LOGIN =================
-app.post("/api/admin/login", (req, res) => {
-  if (
-    req.body.username !== process.env.ADMIN_USER ||
-    req.body.password !== process.env.ADMIN_PASS
-  ) {
-    return res.status(401).json({ ok: false });
-  }
-
-  const token = sign({ admin: true });
-
-  res.setHeader(
-    "Set-Cookie",
-    `admin_token=${token}; HttpOnly; Path=/; Max-Age=3600; SameSite=Lax`
-  );
-
-  res.json({ ok: true });
-});
-
-function requireAdmin(req, res, next) {
-  const token = parseCookies(req).admin_token;
-  if (!verify(token, { admin: true }))
-    return res.status(401).json({ ok: false });
-  next();
-}
-
-// ================= CREATE / UPDATE USER =================
-app.post("/api/admin/user", requireAdmin, async (req, res) => {
-  const { username, password, bkashNumber, amount, blocked } = req.body;
-
-  await db.collection("users").updateOne(
-    { username },
-    {
-      $set: {
-        username,
-        password,
-        bkashNumber,
-        amount,
-        blocked: blocked || false
-      }
-    },
-    { upsert: true }
-  );
-
-  res.json({ ok: true });
-});
-
-// ================= STATIC =================
+// Serve public folder
 app.use(express.static(path.join(__dirname, "public")));
 
-app.listen(PORT, () =>
-  console.log("Server running on port " + PORT)
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+const SettingsSchema = new mongoose.Schema({
+  bkashNumber: String,
+  amount: String,
+  blocked: { type: Boolean, default: false }
+});
+
+const Settings = mongoose.model("Settings", SettingsSchema);
+
+// Default settings if empty
+app.get("/api/settings", async (req, res) => {
+  let settings = await Settings.findOne();
+  if (!settings) {
+    settings = await Settings.create({
+      bkashNumber: "017XXXXXXXX",
+      amount: "500",
+      blocked: false
+    });
+  }
+  res.json(settings);
+});
+
+app.post("/api/update", async (req, res) => {
+  const { bkashNumber, amount } = req.body;
+  let settings = await Settings.findOne();
+  if (!settings) {
+    settings = new Settings();
+  }
+  settings.bkashNumber = bkashNumber;
+  settings.amount = amount;
+  await settings.save();
+  res.json({ message: "Updated" });
+});
+
+app.post("/api/block", async (req, res) => {
+  const { status } = req.body;
+  let settings = await Settings.findOne();
+  settings.blocked = status;
+  await settings.save();
+  res.json({ message: "Block status changed" });
+});
+
+app.listen(process.env.PORT, () =>
+  console.log("Server running on port " + process.env.PORT)
 );
