@@ -1,6 +1,7 @@
 {
   "name": "railway-payment",
   "version": "1.0.0",
+  "description": "Railway Premium Payment System",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
