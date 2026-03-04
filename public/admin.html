@@ -8,22 +8,25 @@
 <body>
 
 <div class="container">
+
   <div class="card">
+    <img src="logo.png" class="logo">
     <h2>Admin Login</h2>
-    <input id="auser" placeholder="Admin Username" class="input"><br>
-    <input id="apass" type="password" placeholder="Admin Password" class="input"><br>
+    <input id="auser" class="input" placeholder="Admin Username">
+    <input id="apass" type="password" class="input" placeholder="Admin Password">
     <button onclick="adminLogin()" class="btn">Login</button>
   </div>
 
   <div class="card">
     <h2>Create / Update User</h2>
-    <input id="uuser" placeholder="Username" class="input"><br>
-    <input id="upass" placeholder="Password" class="input"><br>
-    <input id="unum" placeholder="bKash Number" class="input"><br>
-    <input id="uamount" type="number" placeholder="Amount" class="input"><br>
-    <label><input type="checkbox" id="ublock"> Block User</label><br><br>
+    <input id="uuser" class="input" placeholder="Username">
+    <input id="upass" class="input" placeholder="Password">
+    <input id="unum" class="input" placeholder="bKash Number">
+    <input id="uamount" type="number" class="input" placeholder="Amount">
+    <label><input type="checkbox" id="ublock"> Block User</label>
     <button onclick="saveUser()" class="btn">Save User</button>
   </div>
+
 </div>
 
 <script>
