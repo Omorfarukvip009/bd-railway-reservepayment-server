@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<title>User Login</title>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>User Login</h2>
+
+    <input id="username" placeholder="Username" class="input"><br>
+    <input id="password" type="password" placeholder="Password" class="input"><br>
+    <button onclick="login()" class="btn">Login</button>
+
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+async function login(){
+  const res = await fetch("/api/user/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      username:username.value,
+      password:password.value
+    })
+  });
+
+  if(res.status===404){
+    document.body.innerHTML="<h1 style='text-align:center;margin-top:100px'>404 Not Found</h1>";
+    return;
+  }
+
+  const data=await res.json();
+  if(!data.ok){
+    result.innerHTML="Invalid Login";
+    return;
+  }
+
+  result.innerHTML=`
+    <h3>Payment Info</h3>
+    bKash: ${data.bkashNumber}<br>
+    Amount: ৳${data.amount}
+  `;
+}
+</script>
+
+</body>
+</html>
