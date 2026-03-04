@@ -20,7 +20,7 @@ async function start() {
 }
 start();
 
-// ===== Token =====
+// ===== Simple Token System =====
 function sign(data) {
   return crypto.createHmac("sha256", process.env.JWT_SECRET)
     .update(JSON.stringify(data))
@@ -106,19 +106,9 @@ app.post("/api/admin/user", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-// ================= BLOCK USER =================
-app.post("/api/admin/block", requireAdmin, async (req, res) => {
-  const { username, blocked } = req.body;
-
-  await db.collection("users").updateOne(
-    { username },
-    { $set: { blocked } }
-  );
-
-  res.json({ ok: true });
-});
-
-// ===== Static =====
+// ================= STATIC =================
 app.use(express.static(path.join(__dirname, "public")));
 
-app.listen(PORT, () => console.log("Server Running on Port " + PORT));
+app.listen(PORT, () =>
+  console.log("Server running on port " + PORT)
+);
