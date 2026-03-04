@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<title>Admin Panel</title>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>Admin Login</h2>
+    <input id="auser" placeholder="Admin Username" class="input"><br>
+    <input id="apass" type="password" placeholder="Admin Password" class="input"><br>
+    <button onclick="adminLogin()" class="btn">Login</button>
+  </div>
+
+  <div class="card">
+    <h2>Create / Update User</h2>
+    <input id="uuser" placeholder="Username" class="input"><br>
+    <input id="upass" placeholder="Password" class="input"><br>
+    <input id="unum" placeholder="bKash Number" class="input"><br>
+    <input id="uamount" type="number" placeholder="Amount" class="input"><br>
+    <label><input type="checkbox" id="ublock"> Block User</label><br><br>
+    <button onclick="saveUser()" class="btn">Save User</button>
+  </div>
+</div>
+
+<script>
+async function adminLogin(){
+  await fetch("/api/admin/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      username:auser.value,
+      password:apass.value
+    })
+  });
+}
+
+async function saveUser(){
+  await fetch("/api/admin/user",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      username:uuser.value,
+      password:upass.value,
+      bkashNumber:unum.value,
+      amount:Number(uamount.value),
+      blocked:ublock.checked
+    })
+  });
+}
+</script>
+
+</body>
+</html>
