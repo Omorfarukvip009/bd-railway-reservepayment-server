@@ -2,57 +2,48 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="/styles.css">
 <title>Admin Panel</title>
 </head>
 <body>
 
 <div class="container">
+<h2>Admin Panel</h2>
 
-  <div class="card">
-    <img src="logo.png" class="logo">
-    <h2>Admin Login</h2>
-    <input id="auser" class="input" placeholder="Admin Username">
-    <input id="apass" type="password" class="input" placeholder="Admin Password">
-    <button onclick="adminLogin()" class="btn">Login</button>
-  </div>
+<input type="text" id="number" placeholder="Bkash Number">
+<input type="text" id="amount" placeholder="Amount">
 
-  <div class="card">
-    <h2>Create / Update User</h2>
-    <input id="uuser" class="input" placeholder="Username">
-    <input id="upass" class="input" placeholder="Password">
-    <input id="unum" class="input" placeholder="bKash Number">
-    <input id="uamount" type="number" class="input" placeholder="Amount">
-    <label><input type="checkbox" id="ublock"> Block User</label>
-    <button onclick="saveUser()" class="btn">Save User</button>
-  </div>
-
+<button onclick="update()">Update</button>
+<button onclick="block()">Hide Website</button>
+<button onclick="show()">Show Website</button>
 </div>
 
 <script>
-async function adminLogin(){
-  await fetch("/api/admin/login",{
+function update(){
+  fetch("/api/update",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      username:auser.value,
-      password:apass.value
+      bkashNumber:document.getElementById("number").value,
+      amount:document.getElementById("amount").value
     })
-  });
+  }).then(()=>alert("Updated"));
 }
 
-async function saveUser(){
-  await fetch("/api/admin/user",{
+function block(){
+  fetch("/api/block",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      username:uuser.value,
-      password:upass.value,
-      bkashNumber:unum.value,
-      amount:Number(uamount.value),
-      blocked:ublock.checked
-    })
-  });
+    body:JSON.stringify({status:true})
+  }).then(()=>alert("Website Hidden"));
+}
+
+function show(){
+  fetch("/api/block",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({status:false})
+  }).then(()=>alert("Website Visible"));
 }
 </script>
 
