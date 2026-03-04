@@ -2,50 +2,32 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="styles.css">
-<title>Railway Login</title>
+<link rel="stylesheet" href="/styles.css">
+<title>Railway Payment</title>
 </head>
 <body>
 
 <div class="container">
-  <div class="card">
-    <img src="logo.png" class="logo">
-    <h2>User Login</h2>
+  <img src="/logo.png" class="logo">
 
-    <input id="username" class="input" placeholder="Username">
-    <input id="password" type="password" class="input" placeholder="Password">
-    <button onclick="login()" class="btn">Login</button>
-
-    <div id="result" style="margin-top:15px;text-align:center;"></div>
+  <div id="content">
+    <h2>Railway Payment Login</h2>
+    <p>Bkash Number: <span id="number"></span></p>
+    <p>Amount: ৳<span id="amount"></span></p>
   </div>
 </div>
 
 <script>
-async function login(){
-  const res = await fetch("/api/user/login",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      username:username.value,
-      password:password.value
-    })
-  });
-
-  if(res.status===404){
-    document.body.innerHTML="<h1 style='color:white;text-align:center;margin-top:100px'>404 Not Found</h1>";
-    return;
+fetch("/api/settings")
+.then(res => res.json())
+.then(data => {
+  if(data.blocked){
+    document.body.innerHTML = "<h1 style='text-align:center;margin-top:100px;'>404 ERROR NOTHING FOUND</h1>";
+  } else {
+    document.getElementById("number").innerText = data.bkashNumber;
+    document.getElementById("amount").innerText = data.amount;
   }
-
-  const data=await res.json();
-  if(!data.ok){
-    result.innerHTML="Invalid Login";
-    return;
-  }
-
-  result.innerHTML=
-    `<b>Payment Number:</b> ${data.bkashNumber}<br>
-     <b>Amount:</b> ৳${data.amount}`;
-}
+});
 </script>
 
 </body>
